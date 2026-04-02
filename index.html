@@ -843,10 +843,12 @@
         body.appendChild(row);
       });
 
-      const sub = document.createElement('div');
-      sub.className = 'modal-subscribe';
-      sub.innerHTML = '<a href="' + cal.url.replace('https://', 'webcal://') + '">Subscribe to ' + cal.name + '</a>';
-      body.appendChild(sub);
+      if (isApple) {
+        const sub = document.createElement('div');
+        sub.className = 'modal-subscribe';
+        sub.innerHTML = '<a href="' + cal.url.replace('https://', 'webcal://') + '">Subscribe to ' + cal.name + '</a>';
+        body.appendChild(sub);
+      }
 
       document.getElementById('modal-overlay').classList.add('open');
     }
