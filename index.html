@@ -967,6 +967,9 @@
         firstDay:         0,
         initialView:      window.innerWidth < 640 ? 'listMonth' : 'dayGridMonth',
         displayEventTime: false,
+        views: {
+          listMonth: { displayEventTime: true }
+        },
         eventClick:       openModal,
         noEventsContent:  'No events to display'
       });
