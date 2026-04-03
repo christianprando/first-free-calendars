@@ -2,7 +2,12 @@ name: Fetch Calendars
 
 on:
   schedule:
-    - cron: '0 * * * *'   # every hour
+    - cron: '0 13 * * *'  # 7am MDT
+    - cron: '0 15 * * *'  # 9am MDT
+    - cron: '0 18 * * *'  # 12pm MDT
+    - cron: '0 21 * * *'  # 3pm MDT
+    - cron: '0 23 * * *'  # 5pm MDT
+    - cron: '0 1 * * *'   # 7pm MDT
   workflow_dispatch:        # allow manual trigger from GitHub Actions tab
 
 permissions:
