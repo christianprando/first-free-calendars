@@ -655,14 +655,14 @@
     const CALENDARS = [
       {
         id:        'public',
-        name:      'Public Events',
+        name:      'Public',
         color:     '#6366f1',
         localPath: 'calendars/public.ics',
         url:       'https://outlook.office365.com/owa/calendar/5b6e6c2fedab4ca0a90fced22273b7d8@freechurchcalgary.com/59cd8b6c9d4649dfb83bb379f09cbc3314956804182017763219/calendar.ics'
       },
       {
         id:        'ministerial',
-        name:      'Ministerial',
+        name:      'Ministries',
         color:     '#10b981',
         localPath: 'calendars/ministerial.ics',
         url:       'https://outlook.office365.com/owa/calendar/5b6e6c2fedab4ca0a90fced22273b7d8@freechurchcalgary.com/c9a0306ed2b846b38bf6111b9a467b3f11924704179160873012/calendar.ics'
@@ -924,7 +924,10 @@
       document.documentElement.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
       const btn = document.getElementById('theme-toggle');
-      if (btn) btn.innerHTML = theme === 'dark' ? ICON_SUN : ICON_MOON;
+      if (btn) {
+        btn.innerHTML    = theme === 'dark' ? ICON_SUN : ICON_MOON;
+        btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+      }
     }
 
     // Restore saved preference immediately (before DOMContentLoaded) to avoid flash
@@ -965,7 +968,8 @@
           center: 'title',
           right:  'dayGridMonth,timeGridDay,listMonth'
         },
-        buttonText:       { today: 'Today', month: 'Month', day: 'Day', list: 'List' },
+        buttonText:       { today: 'Today', month: 'M', day: 'D', list: '\u2261' },
+        buttonHints:      { today: 'Go to today', month: 'Month view', day: 'Day view', list: 'List view', prev: 'Previous', next: 'Next' },
         height:           'auto',
         firstDay:         0,
         initialView:      window.innerWidth < 640 ? 'listMonth' : 'dayGridMonth',
