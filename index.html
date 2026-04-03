@@ -344,11 +344,34 @@
       text-decoration: none !important;
     }
 
-    .fc .fc-list-event td {
+    .fc .fc-list-event {
+      display: flex !important;
+      align-items: center;
+    }
+
+    .fc .fc-list-event > td {
+      display: block !important;
       border-color: var(--border) !important;
-      padding: .55rem 1rem !important;
       font-size: .83rem !important;
       color: var(--text) !important;
+    }
+
+    .fc .fc-list-event-graphic {
+      order: 1;
+      padding: .55rem .5rem .55rem 1rem !important;
+    }
+
+    .fc .fc-list-event-time {
+      order: 2;
+      padding: .55rem .75rem .55rem 0 !important;
+      white-space: nowrap;
+      color: var(--muted) !important;
+    }
+
+    .fc .fc-list-event-title {
+      order: 3;
+      flex: 1;
+      padding: .55rem 1rem .55rem 0 !important;
     }
 
     .fc .fc-list-event:hover td { background: var(--surface2) !important; }
