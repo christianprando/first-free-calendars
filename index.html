@@ -741,12 +741,29 @@
       color: var(--accent-text);
     }
 
-    .drawer-sub-actions {
-      display: flex;
-      gap: .4rem;
-      margin-left: auto;
-      flex-shrink: 0;
+    .drawer-expand {
+      display: none;
+      flex-direction: column;
     }
+
+    .drawer-expand.open { display: flex; }
+
+    .drawer-expand-row {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .55rem 1rem .55rem 2.25rem;
+      font-size: .82rem;
+      color: var(--text);
+      cursor: pointer;
+      background: var(--surface2);
+      border-top: 1px solid var(--border);
+      text-decoration: none;
+    }
+
+    .drawer-expand-row:hover { opacity: .8; }
+
+    .drawer-expand-row svg { flex-shrink: 0; color: var(--muted); }
 
     /* ── Responsive ── */
     @media (min-width: 640px) {
@@ -1125,19 +1142,54 @@
       subSection.innerHTML = '<div class="drawer-section-title">Subscribe</div>';
       CALENDARS.forEach(cal => {
         const webcal = cal.url.replace('https://', 'webcal://');
-        const row = document.createElement('div');
+        const wrapper = document.createElement('div');
+
+        // Header row — toggles the expand
+        const row = document.createElement('button');
         row.className = 'drawer-item';
-        row.style.cursor = 'default';
         row.innerHTML =
           '<span class="drawer-dot" style="background:' + cal.color + '"></span>' +
           '<span class="drawer-item-label">' + cal.name + '</span>' +
-          '<div class="drawer-sub-actions">' +
-            (isApple ? '<a href="' + webcal + '" class="sub-btn sub-btn-primary" style="background:' + cal.color + '">Subscribe</a>' : '') +
-            '<button class="sub-btn ' + (isApple ? 'sub-btn-secondary' : 'sub-btn-primary') + '" ' +
-              (!isApple ? 'style="background:' + cal.color + '"' : '') +
-              ' onclick="navigator.clipboard.writeText(\'' + cal.url + '\').then(() => { this.textContent=\'Copied!\'; setTimeout(() => this.textContent=\'Copy link\', 2000); })">Copy link</button>' +
-          '</div>';
-        subSection.appendChild(row);
+          '<svg style="margin-left:auto;flex-shrink:0;transition:transform .2s" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
+        // Expand container
+        const expand = document.createElement('div');
+        expand.className = 'drawer-expand';
+
+        if (isApple) {
+          const subRow = document.createElement('a');
+          subRow.className = 'drawer-expand-row';
+          subRow.href = webcal;
+          subRow.innerHTML =
+            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' +
+            'Subscribe';
+          expand.appendChild(subRow);
+        }
+
+        const copyRow = document.createElement('button');
+        copyRow.className = 'drawer-expand-row';
+        copyRow.style.width = '100%';
+        copyRow.style.border = 'none';
+        copyRow.style.background = 'var(--surface2)';
+        copyRow.innerHTML =
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+          'Copy link';
+        copyRow.addEventListener('click', () => {
+          navigator.clipboard.writeText(cal.url).then(() => {
+            copyRow.lastChild.textContent = 'Copied!';
+            setTimeout(() => copyRow.lastChild.textContent = 'Copy link', 2000);
+          });
+        });
+        expand.appendChild(copyRow);
+
+        row.addEventListener('click', () => {
+          const isOpen = expand.classList.toggle('open');
+          row.querySelector('svg:last-child').style.transform = isOpen ? 'rotate(180deg)' : '';
+        });
+
+        wrapper.appendChild(row);
+        wrapper.appendChild(expand);
+        subSection.appendChild(wrapper);
       });
       drawer.appendChild(subSection);
     }
@@ -1254,14 +1306,10 @@
       const isMobile = window.innerWidth < 640;
       fcCalendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
         initialView:  isMobile ? 'listMonth' : 'dayGridMonth',
-        headerToolbar: isMobile ? {
+        headerToolbar: {
           left:   'prev,next',
           center: 'title',
           right:  'today'
-        } : {
-          left:   'prev,next today',
-          center: 'title',
-          right:  ''
         },
         buttonText:       { today: 'Today', month: 'M', day: 'D', list: '\u2261' },
         buttonHints:      { today: 'Go to today', month: 'Month view', day: 'Day view', list: 'List view', prev: 'Previous', next: 'Next' },
@@ -1274,7 +1322,13 @@
           listMonth: { displayEventTime: true }
         },
         eventClick:       openModal,
-        noEventsContent:  'No events to display'
+        noEventsContent:  'No events to display',
+        datesSet: info => {
+          drawerCurrentView = info.view.type;
+          document.querySelectorAll('[data-view-id]').forEach(el => {
+            el.classList.toggle('view-active', el.dataset.viewId === drawerCurrentView);
+          });
+        }
       });
 
       fcCalendar.render();
